@@ -16,6 +16,7 @@ namespace TinyHealthCheck
         private readonly string _contentType;
         private readonly string _hostname;
         private readonly int _port;
+        private readonly string _urlPath;
         private readonly Func<CancellationToken, Task<string>> _healthCheckFunction;
         private readonly HttpListener _listener = new HttpListener();
 
@@ -23,15 +24,18 @@ namespace TinyHealthCheck
             string contentType = "application/json",
             string hostname = "localhost",
             int port = 8080,
+            string urlPath = "healthz",
             Func<CancellationToken, Task<string>> healthCheckFunction = null)
         {
             if (string.IsNullOrWhiteSpace(contentType)) throw new ArgumentException($"'{nameof(contentType)}' cannot be null or whitespace.", nameof(contentType));
             if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentException($"'{nameof(hostname)}' cannot be null or whitespace.", nameof(hostname));
+            if (string.IsNullOrWhiteSpace(urlPath)) throw new ArgumentException($"'{nameof(urlPath)}' cannot be null or whitespace.", nameof(urlPath));
 
             _logger = logger ?? new NullLogger<TinyHealthCheck>();
             _contentType = contentType;
             _hostname = hostname;
             _port = port;
+            _urlPath = urlPath;
             _healthCheckFunction = healthCheckFunction ?? DefaultHealthCheck;
         }
 
@@ -67,12 +71,19 @@ namespace TinyHealthCheck
 
             _logger.LogInformation($"TinyHealthCheck recieved a request from {request.RemoteEndPoint}");
 
-            response.ContentType = _contentType;
-            response.ContentEncoding = Encoding.UTF8;
+            if (request.HttpMethod.ToUpper() != "GET" || request.Url.PathAndQuery[1..] != _urlPath)
+            {
+                response.StatusCode = 404;
+                response.Close();
+                return;
+            }
 
             var responseBody = await _healthCheckFunction(cancellationToken);
 
+            response.ContentType = _contentType;
+            response.ContentEncoding = Encoding.UTF8;
             byte[] data = Encoding.UTF8.GetBytes(responseBody);
+
             response.ContentLength64 = data.LongLength;
             await response.OutputStream.WriteAsync(data, cancellationToken);
 
