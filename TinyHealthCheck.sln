@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyHealthCheck", "TinyHealthCheck\TinyHealthCheck.csproj", "{7D76F557-A597-4E39-BBB7-74EA4D02FCA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyServiceWorker", "DummyServiceWorker\DummyServiceWorker.csproj", "{86F621B2-D555-4F38-AF67-84301278C6DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D76F557-A597-4E39-BBB7-74EA4D02FCA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D76F557-A597-4E39-BBB7-74EA4D02FCA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D76F557-A597-4E39-BBB7-74EA4D02FCA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D76F557-A597-4E39-BBB7-74EA4D02FCA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86F621B2-D555-4F38-AF67-84301278C6DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86F621B2-D555-4F38-AF67-84301278C6DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86F621B2-D555-4F38-AF67-84301278C6DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86F621B2-D555-4F38-AF67-84301278C6DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {88729E8A-E554-4BD4-94C6-72B267B1E4FC}
+	EndGlobalSection
+EndGlobal
