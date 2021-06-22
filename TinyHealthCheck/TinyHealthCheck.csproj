@@ -10,7 +10,7 @@
     <Version>1.0.0</Version>
     <Company />
     <Description>
-      Dead simple HTTP health checks without the full MVC framework
+      Dead simple HTTP health checks without the MVC framework.
     </Description>
   </PropertyGroup>
 
