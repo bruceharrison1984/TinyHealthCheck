@@ -166,6 +166,7 @@ info: DummyServiceWorker.Program.CustomHealthCheck[0]
 ```
 Once 10 iterations have been exceeded, the response will change:
 ```json
+//StatusCode 500
 {
     "Status": "Unhealthy!",
     "Iteration": 10,
