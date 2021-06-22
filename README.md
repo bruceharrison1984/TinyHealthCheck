@@ -9,24 +9,31 @@ Simply add the TinyHealthCheck as a Hosted Service to have it run as a backgroun
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
 {
+    var processStartTime = DateTimeOffset.Now;
     return Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
             services.AddHostedService<Worker>();
-            services.AddHostedService<TinyHealthCheck.TinyHealthCheck>();
+            services.AddBasicTinyHealthCheck(config =>
+            {
+                config.Hostname = "*";
+                config.Port = 8080;
+                return config;
+            });
         });
 }
 ```
 
-This will create a single endpoint on `http://localhost:8080/healthz` with the following response body:
+This will create an endpoint on `http://localhost:8080/healthz` with the following response body:
 ```json
 {
     "Status": "Healthy!"
 }
 ```
 
-## Advanced Usage
-The function that returns the response body can be completely overridden to allow for any response:
+## Uptime Monitor Endpoint
+Call `AddBasicTinyHealthCheckWithUptime` to add an uptime counter to the output:
+
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
 {
@@ -35,24 +42,67 @@ public static IHostBuilder CreateHostBuilder(string[] args)
         .ConfigureServices((hostContext, services) =>
         {
             services.AddHostedService<Worker>();
-            services.AddHostedService<TinyHealthCheck.TinyHealthCheck>(sp =>
+            services.AddBasicTinyHealthCheckWithUptime(config =>
             {
-                return new TinyHealthCheck.TinyHealthCheck(
-                    logger: sp.GetRequiredService<ILogger<TinyHealthCheck.TinyHealthCheck>>(),
-                    hostname: "*",
-                    port: 8081,
-                    contentType: "application/json",
-                    urlPath: "healthz",
-                    healthCheckFunction: async cancellationToken => JsonSerializer.Serialize(new { Status = "Healthy!", Uptime = (DateTimeOffset.Now - processStartTime).ToString() }));
+                config.Hostname = "*";
+                config.Port = 8081;
+                return config;
             });
         });
+}
+```
+
+This will create an endpoint on `http://localhost:8081/healthz` with the following response body:
+```json
+{
+    "Status": "Healthy!",
+    "Uptime": "<ever increasing timespan>"
+}
+```
+
+## Advanced Usage
+Calling `AddCustomTinyHealthCheck` with a class that inheirits from IHealthCheck allows you to create whatever type of response you want.
+It also allows you to leverage DI to gain access to values from your other DI service containers. You could use this to get queue lengths,
+check if databases are accessible, etc.
+
+```csharp
+public static IHostBuilder CreateHostBuilder(string[] args)
+{
+    var processStartTime = DateTimeOffset.Now;
+    return Host.CreateDefaultBuilder(args)
+        .ConfigureServices((hostContext, services) =>
+        {
+            services.AddHostedService<Worker>();
+            services.AddCustomTinyHealthCheck<CustomHealthCheck>(config =>
+            {
+                config.Hostname = "*";
+                config.Port = 8082;
+                return config;
+            });
+        });
+}
+
+public class CustomHealthCheck : IHealthCheck
+{
+    private readonly ILogger<CustomHealthCheck> _logger;
+
+    public CustomHealthCheck(ILogger<CustomHealthCheck> logger)
+    {
+        _logger = logger;
+    }
+
+    public async Task<string> Execute(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
+        return JsonSerializer.Serialize(new { Status = "Healthy!", CustomValue = "SomeValueFromServices" });
+    }
 }
 ```
 This will return the following body:
 ```json
 {
     "Status": "Healthy!",
-    "Uptime": "00:00:04.5997430"
+    "CustomValue": "SomeValueFromServices"
 }
 ```
 
