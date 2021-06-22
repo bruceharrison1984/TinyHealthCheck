@@ -26,19 +26,16 @@ namespace DummyServiceWorker
                     services.AddHostedService<Worker>();
                     services.AddBasicTinyHealthCheck(config =>
                     {
-                        config.Hostname = "*";
                         config.Port = 8080;
                         return config;
                     });
                     services.AddBasicTinyHealthCheckWithUptime(config =>
                     {
-                        config.Hostname = "*";
                         config.Port = 8081;
                         return config;
                     });
                     services.AddCustomTinyHealthCheck<CustomHealthCheck>(config =>
                     {
-                        config.Hostname = "*";
                         config.Port = 8082;
                         return config;
                     });
