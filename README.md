@@ -1,7 +1,7 @@
 # TinyHealthCheck
-A very small library for adding health checks to C# ServiceWorkers. It can be used anywhere you want a health check endpoint, but
-don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), and utilizes a low priority thread pool 
-for minimal impact on your service worker processes.
+A very small library for adding health checks to C# Service Workers or other headless processes running in a container. It can be used 
+anywhere you want a health check endpoint, but don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), 
+and utilizes a low priority thread pool for minimal impact on your service worker processes.
 
 [![Generic badge](https://img.shields.io/badge/Nuget-Download-blue.svg)](https://www.nuget.org/packages/TinyHealthCheck/)
 
