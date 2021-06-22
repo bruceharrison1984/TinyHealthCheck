@@ -96,6 +96,7 @@ public static IHostBuilder CreateHostBuilder(string[] args)
     return Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddSingleton<WorkerStateService>();
             services.AddHostedService<Worker>();
             services.AddCustomTinyHealthCheck<CustomHealthCheck>(config =>
             {
@@ -151,15 +152,26 @@ public static IHostBuilder CreateHostBuilder(string[] args)
 ```
 This will return the following body:
 ```json
+//StatusCode 200
 {
     "Status": "Healthy!",
-    "CustomValue": "SomeValueFromServices"
+    "Iteration": 3,
+    "IsServiceRunning": true
 }
 ```
 As well as print a message in the application console:
 ```sh
 info: DummyServiceWorker.Program.CustomHealthCheck[0]
       This is an example of accessing the DI containers for logging. You can access any service that is registered
+```
+Once 10 iterations have been exceeded, the response will change:
+```json
+{
+    "Status": "Unhealthy!",
+    "Iteration": 10,
+    "IsServiceRunning": false,
+    "ErrorMessage": "We went over 10 iterations, so the service worker quit!"
+}
 ```
 
 ## Example
