@@ -1,52 +1,33 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Net;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace TinyHealthCheck
 {
-    public class TinyHealthCheck : BackgroundService
+    public class HealthCheckService : BackgroundService
     {
-        private readonly ILogger<TinyHealthCheck> _logger;
-        private readonly string _contentType;
-        private readonly string _hostname;
-        private readonly int _port;
-        private readonly string _urlPath;
-        private readonly Func<CancellationToken, Task<string>> _healthCheckFunction;
+        private readonly ILogger<HealthCheckService> _logger;
+        private readonly TinyHealthCheckConfig _config;
         private readonly HttpListener _listener = new HttpListener();
 
-        public TinyHealthCheck(ILogger<TinyHealthCheck> logger,
-            string contentType = "application/json",
-            string hostname = "localhost",
-            int port = 8080,
-            string urlPath = "healthz",
-            Func<CancellationToken, Task<string>> healthCheckFunction = null)
+        public HealthCheckService(ILogger<HealthCheckService> logger, TinyHealthCheckConfig config)
         {
-            if (string.IsNullOrWhiteSpace(contentType)) throw new ArgumentException($"'{nameof(contentType)}' cannot be null or whitespace.", nameof(contentType));
-            if (string.IsNullOrWhiteSpace(hostname)) throw new ArgumentException($"'{nameof(hostname)}' cannot be null or whitespace.", nameof(hostname));
-            if (string.IsNullOrWhiteSpace(urlPath)) throw new ArgumentException($"'{nameof(urlPath)}' cannot be null or whitespace.", nameof(urlPath));
-
-            _logger = logger ?? new NullLogger<TinyHealthCheck>();
-            _contentType = contentType;
-            _hostname = hostname;
-            _port = port;
-            _urlPath = urlPath;
-            _healthCheckFunction = healthCheckFunction ?? DefaultHealthCheck;
+            _logger = logger;
+            _config = config;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             try
             {
-                _listener.Prefixes.Add($"http://{_hostname}:{_port}/");
+                _listener.Prefixes.Add($"http://{_config.Hostname}:{_config.Port}/");
                 _listener.Start();
 
-                _logger.LogInformation($"TinyHealthCheck started on port '{_port}'");
+                _logger.LogInformation($"TinyHealthCheck started on port '{_config.Port}'");
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -56,7 +37,7 @@ namespace TinyHealthCheck
             }
             catch (HttpListenerException e)
             {
-                _logger.LogError(e, $"Port '{_port}' is already occupied by another process");
+                _logger.LogError(e, $"Port '{_config.Port}' is already occupied by another process");
             }
             catch (Exception e)
             {
@@ -71,16 +52,16 @@ namespace TinyHealthCheck
 
             _logger.LogInformation($"TinyHealthCheck recieved a request from {request.RemoteEndPoint}");
 
-            if (request.HttpMethod.ToUpper() != "GET" || request.Url.PathAndQuery[1..] != _urlPath)
+            if (request.HttpMethod.ToUpper() != "GET" || request.Url.PathAndQuery != _config.UrlPath)
             {
                 response.StatusCode = 404;
                 response.Close();
                 return;
             }
 
-            var responseBody = await _healthCheckFunction(cancellationToken);
+            var responseBody = await _config.HealthCheckFunction(cancellationToken);
 
-            response.ContentType = _contentType;
+            response.ContentType = _config.ContentType;
             response.ContentEncoding = Encoding.UTF8;
             byte[] data = Encoding.UTF8.GetBytes(responseBody);
 
@@ -88,11 +69,6 @@ namespace TinyHealthCheck
             await response.OutputStream.WriteAsync(data, cancellationToken);
 
             response.Close();
-        }
-
-        private async Task<string> DefaultHealthCheck(CancellationToken cancellationToken)
-        {
-            return JsonSerializer.Serialize(new { Status = "Healthy!" });
         }
     }
 }

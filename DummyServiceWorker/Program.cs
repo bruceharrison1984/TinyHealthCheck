@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Text.Json;
+using TinyHealthCheck;
 
 namespace DummyServiceWorker
 {
@@ -20,16 +19,7 @@ namespace DummyServiceWorker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
-                    services.AddHostedService<TinyHealthCheck.TinyHealthCheck>(sp =>
-                    {
-                        return new TinyHealthCheck.TinyHealthCheck(
-                            logger: sp.GetRequiredService<ILogger<TinyHealthCheck.TinyHealthCheck>>(),
-                            hostname: "*",
-                            port: 8081,
-                            contentType: "application/json",
-                            urlPath: "healthz",
-                            healthCheckFunction: async cancellationToken => JsonSerializer.Serialize(new { Status = "Healthy!", Uptime = (DateTimeOffset.Now - processStartTime).ToString() }));
-                    });
+                    services.AddBasicHealthCheckWithUptime();
                 });
         }
     }
