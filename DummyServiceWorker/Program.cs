@@ -23,6 +23,7 @@ namespace DummyServiceWorker
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddSingleton<WorkerStateService>();
                     services.AddHostedService<Worker>();
                     services.AddBasicTinyHealthCheck(config =>
                     {
@@ -45,16 +46,44 @@ namespace DummyServiceWorker
         public class CustomHealthCheck : IHealthCheck
         {
             private readonly ILogger<CustomHealthCheck> _logger;
+            private readonly WorkerStateService _workerStateService;
+            //IHostedServices cannot be reliably retrieved from the DI collection
+            //A secondary stateful service is required in order to get state information out of it
+            //https://stackoverflow.com/a/52038409/889034
 
-            public CustomHealthCheck(ILogger<CustomHealthCheck> logger)
+            public CustomHealthCheck(ILogger<CustomHealthCheck> logger, WorkerStateService workerStateService)
             {
                 _logger = logger;
+                _workerStateService = workerStateService;
             }
 
-            public async Task<string> Execute(CancellationToken cancellationToken)
+            public async Task<HealthCheckResult> Execute(CancellationToken cancellationToken)
             {
                 _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
-                return JsonSerializer.Serialize(new { Status = "Healthy!", CustomValue = "SomeValueFromServices" });
+
+                if (_workerStateService.IsRunning)
+                    return new HealthCheckResult
+                    {
+                        Body = JsonSerializer.Serialize(new
+                        {
+                            Status = "Healthy!",
+                            Iteration = _workerStateService.Iteration,
+                            IsServiceRunning = _workerStateService.IsRunning,
+                        }),
+                        StatusCode = System.Net.HttpStatusCode.OK
+                    };
+
+                return new HealthCheckResult
+                {
+                    Body = JsonSerializer.Serialize(new
+                    {
+                        Status = "Unhealthy!",
+                        Iteration = _workerStateService.Iteration,
+                        IsServiceRunning = _workerStateService.IsRunning,
+                        ErrorMessage = "We went over 10 iterations, so the service worker quit!"
+                    }),
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
             }
         }
     }

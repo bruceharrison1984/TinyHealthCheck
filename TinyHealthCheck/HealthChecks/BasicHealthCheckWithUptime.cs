@@ -10,7 +10,7 @@ namespace TinyHealthCheck.HealthChecks
     {
         private DateTimeOffset processStartTime = DateTimeOffset.Now;
 
-        public async Task<string> Execute(CancellationToken cancellationToken)
+        public async Task<HealthCheckResult> Execute(CancellationToken cancellationToken)
         {
             var responseBody = new
             {
@@ -18,7 +18,11 @@ namespace TinyHealthCheck.HealthChecks
                 Uptime = (DateTimeOffset.Now - processStartTime).ToString()
             };
 
-            return JsonSerializer.Serialize(responseBody);
+            return new HealthCheckResult
+            {
+                Body = JsonSerializer.Serialize(responseBody),
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
     }
 }

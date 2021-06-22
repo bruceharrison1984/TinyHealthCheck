@@ -77,9 +77,17 @@ Calling `AddCustomTinyHealthCheck` with a class that inheirits from IHealthCheck
 It also allows you to leverage DI to gain access to values from your other DI service containers. You could use this to get queue lengths,
 check if databases are accessible, etc.
 
-The return value of `Execute` is a string. It will be converted in to a byte[] and sent as the response. It can be any wire format you choose(json/xml/html/etc), 
-just make sure to assign the appropriate `ContentType` that your health check client expects when you define the health check in CreateHostBuilder. The default ContentType 
-is `application/json`.
+The return value of `Execute` is a `HealthCheckResult`. The Body will be converted in to a byte[], and the StatusCode will be applied to the response. The Body 
+can be any wire format you choose(json/xml/html/etc), just make sure to assign the appropriate `ContentType` that your health check client expects when you define 
+the health check in CreateHostBuilder. The default ContentType is `application/json`.
+
+### IHostedService Note
+If you are using a IHostedService, you will require a secondary service to hold the state of your IHostedService. This is because you cannot
+reliably retrieve IHostedService from the `IServiceProvider` interface. [See this StackOverflow post](https://stackoverflow.com/a/52038409/889034).
+There is a complete example of this in the `DummyServiceWorker` project.
+
+In the example you'll notice that while the HealthCheck on localhost:8082 fails after 10 iterations, the other HealthChecks still report success. A custom
+health check like this allows you to monitor another process from out-of-band, and report when it has failed.
 
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
@@ -98,19 +106,46 @@ public static IHostBuilder CreateHostBuilder(string[] args)
         });
 }
 
-public class CustomHealthCheck : IHealthCheck
+ public class CustomHealthCheck : IHealthCheck
 {
     private readonly ILogger<CustomHealthCheck> _logger;
+    private readonly WorkerStateService _workerStateService;
+    //IHostedServices cannot be reliably retrieved from the DI collection
+    //A secondary stateful service is required in order to get state information out of it
 
-    public CustomHealthCheck(ILogger<CustomHealthCheck> logger)
+    public CustomHealthCheck(ILogger<CustomHealthCheck> logger, WorkerStateService workerStateService)
     {
         _logger = logger;
+        _workerStateService = workerStateService;
     }
 
-    public async Task<string> Execute(CancellationToken cancellationToken)
+    public async Task<HealthCheckResult> Execute(CancellationToken cancellationToken)
     {
         _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
-        return JsonSerializer.Serialize(new { Status = "Healthy!", CustomValue = "SomeValueFromServices" });
+
+        if (_workerStateService.IsRunning)
+            return new HealthCheckResult
+            {
+                Body = JsonSerializer.Serialize(new
+                {
+                    Status = "Healthy!",
+                    Iteration = _workerStateService.Iteration,
+                    IsServiceRunning = _workerStateService.IsRunning,
+                }),
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+
+        return new HealthCheckResult
+        {
+            Body = JsonSerializer.Serialize(new
+            {
+                Status = "Unhealthy!",
+                Iteration = _workerStateService.Iteration,
+                IsServiceRunning = _workerStateService.IsRunning,
+                ErrorMessage = "We went over 10 iterations, so the service worker quit!"
+            }),
+            StatusCode = System.Net.HttpStatusCode.InternalServerError
+        };
     }
 }
 ```
