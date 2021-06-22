@@ -1,16 +1,18 @@
 # TinyHealthCheck
 A very small library for adding health checks to C# ServiceWorkers. It can be used anywhere you want a health check endpoint, but
-don't want to drag in the entire MVC ecosystem to support it. 
+don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), and utilizes a low priority thread pool 
+for low impact on your service worker processes.
 
 ## Notes
  - This health check is meant to be used for internal/private health checks only
     - Expose it to the internet at your own peril
  - **Only GET operations are supported**
     - I have no plans to support other HttpMethods
- - Only one endpoint per port is allowed
+ - Only one endpoint per port is allowed, as well as one UrlPath per port
     - This library was created for Service Workers that normally have *no* usable HTTP web server
     - This library allows endpoints without the full MVC package
         - No middleware, auth, validation, etc
+    - You can run different HealthChecks on different ports
 
 ## Simple Usage
 Simply add the TinyHealthCheck as a Hosted Service to have it run as a background process:
