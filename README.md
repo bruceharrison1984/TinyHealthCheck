@@ -121,6 +121,11 @@ This will return the following body:
     "CustomValue": "SomeValueFromServices"
 }
 ```
+As well as print a message in the application console:
+```sh
+info: DummyServiceWorker.Program.CustomHealthCheck[0]
+      This is an example of accessing the DI containers for logging. You can access any service that is registered
+```
 
 ## Example
 A complete example can be found in the `DummyServiceWorker` directory.
