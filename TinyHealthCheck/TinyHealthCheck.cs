@@ -5,19 +5,22 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TinyHealthCheck.HealthChecks;
 
 namespace TinyHealthCheck
 {
-    public class HealthCheckService : BackgroundService
+    public class HealthCheckService<T> : BackgroundService where T : IHealthCheck, new()
     {
-        private readonly ILogger<HealthCheckService> _logger;
+        private readonly ILogger<HealthCheckService<T>> _logger;
         private readonly TinyHealthCheckConfig _config;
+        private readonly T _healthCheck;
         private readonly HttpListener _listener = new HttpListener();
 
-        public HealthCheckService(ILogger<HealthCheckService> logger, TinyHealthCheckConfig config)
+        public HealthCheckService(ILogger<HealthCheckService<T>> logger, TinyHealthCheckConfig config)
         {
             _logger = logger;
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _healthCheck = new T();
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -57,9 +60,9 @@ namespace TinyHealthCheck
                 response.StatusCode = 404;
                 response.Close();
                 return;
-            }
+            };
 
-            var responseBody = await _config.HealthCheckFunction(cancellationToken);
+            var responseBody = await _healthCheck.Execute(cancellationToken);
 
             response.ContentType = _config.ContentType;
             response.ContentEncoding = Encoding.UTF8;

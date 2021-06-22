@@ -1,24 +1,25 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Text.Json;
+using TinyHealthCheck.HealthChecks;
 
 namespace TinyHealthCheck
 {
     public static class Extensions
     {
-        public static IServiceCollection AddBasicHealthCheck(this IServiceCollection services)
+        public static IServiceCollection AddBasicTinyHealthCheck(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction)
         {
-            return services.AddSingleton<IHostedService>(x => ActivatorUtilities.CreateInstance<HealthCheckService>(x, new object[] { new TinyHealthCheckConfig() }));
+            return services.AddCustomTinyHealthCheck<BasicHealthCheck>(configAction);
         }
 
-        public static IServiceCollection AddBasicHealthCheckWithUptime(this IServiceCollection services)
+        public static IServiceCollection AddBasicTinyHealthCheckWithUptime(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction)
         {
-            var processStartTime = DateTimeOffset.Now;
-            var config = new TinyHealthCheckConfig();
-            config.HealthCheckFunction = async x => JsonSerializer.Serialize(new { Status = "Healthy!", Uptime = (DateTimeOffset.Now - processStartTime).ToString() });
+            return services.AddCustomTinyHealthCheck<BasicHealthCheckWithUptime>(configAction);
+        }
 
-            return services.AddSingleton<IHostedService>(x => ActivatorUtilities.CreateInstance<HealthCheckService>(x, config));
+        public static IServiceCollection AddCustomTinyHealthCheck<T>(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction) where T : IHealthCheck, new()
+        {
+            return services.AddSingleton<IHostedService>(x => ActivatorUtilities.CreateInstance<HealthCheckService<T>>(x, configAction(new TinyHealthCheckConfig())));
         }
     }
 }

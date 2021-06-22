@@ -19,7 +19,12 @@ namespace DummyServiceWorker
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
-                    services.AddBasicHealthCheckWithUptime();
+                    services.AddBasicTinyHealthCheckWithUptime(x =>
+                    {
+                        x.Hostname = "*";
+                        x.Port = 8080;
+                        return x;
+                    });
                 });
         }
     }
