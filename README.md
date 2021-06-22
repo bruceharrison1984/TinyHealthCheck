@@ -17,7 +17,7 @@ for minimal impact on your service worker processes.
     - You can run different HealthChecks on different ports
 
 ## Simple Usage
-Simply add the TinyHealthCheck as a Hosted Service to have it run as a background process:
+Simply add the TinyHealthCheck as a Hosted Service by calling the extension methods to have it run as a background process:
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
 {
