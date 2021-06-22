@@ -1,0 +1,35 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "CborSerialization/**"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Package Nuget
+      run: dotnet pack -p:PackageVersion=1.0.${{ github.run_number }} -o ./output
+
+    - name: Push Nuget Package
+      run: dotnet nuget push ./output/TinyHealthCheck.1.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
