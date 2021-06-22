@@ -3,7 +3,7 @@ A very small library for adding health checks to C# ServiceWorkers. It can be us
 don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), and utilizes a low priority thread pool 
 for low impact on your service worker processes.
 
-[![Generic badge](https://img.shields.io/badge/Nuget-Download-Blue.svg)](https://shields.io/)
+[![Generic badge](https://img.shields.io/badge/Nuget-Download-Blue.svg)](https://www.nuget.org/packages/TinyHealthCheck/)
 
 ## Notes
  - This health check is meant to be used for internal/private health checks only
