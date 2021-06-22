@@ -12,8 +12,8 @@ for minimal impact on your service worker processes.
     - I have no plans to support other HttpMethods
  - Only one endpoint per port is allowed, as well as one UrlPath per port
     - This library was created for Service Workers that normally have *no* usable HTTP web server
-    - This library allows endpoints without the full MVC package
-        - No middleware, auth, validation, etc
+    - This library creates endpoints without *any* of the MVC packages
+        - This means no middleware, auth, validation, etc
     - You can run different HealthChecks on different ports
 
 ## Simple Usage
