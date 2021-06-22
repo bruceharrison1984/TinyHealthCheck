@@ -32,4 +32,4 @@ jobs:
       run: dotnet pack -p:PackageVersion=0.0.${{ github.run_number }} -o ./output
 
     - name: Push Nuget Package
-      run: dotnet nuget push ./output/TinyHealthCheck.1.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./output/TinyHealthCheck.0.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
