@@ -119,6 +119,7 @@ This will return the following body:
 
 ## Hostname consideration
 By default, the `hostname` parameter is set to `localhost`. This will work fine for local development, but will not work across the network.
-To allow listening on all interfaces, you must set hostname to `*`. There are also security implications to doing this.
+To allow listening on all interfaces, you must set hostname to `*`. There are also security implications to doing this, which is why it is not
+recommended to expose these health check endpoints to the internet.
 
 **On windows, you must run the process as an administrator to use * as the hostname! Failure to do this will result in the TinyHealthCheck process failing**
