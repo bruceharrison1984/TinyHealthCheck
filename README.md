@@ -1,6 +1,6 @@
 # TinyHealthCheck
 A very small library for adding health checks to C# ServiceWorkers. It can be used anywhere you want a health check endpoint, but
-don't want to drag in the entire MVC ecosystemt to support it. 
+don't want to drag in the entire MVC ecosystem to support it. 
 
 ## Notes
  - This health check is meant to be used for internal/private health checks only
