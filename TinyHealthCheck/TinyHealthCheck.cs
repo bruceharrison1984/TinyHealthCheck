@@ -34,8 +34,8 @@ namespace TinyHealthCheck
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var httpContext = await _listener.GetContextAsync();
-                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck(x, cancellationToken), httpContext, false);
+                    var httpContext = await _listener.GetContextAsync().ConfigureAwait(false);
+                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck(x, cancellationToken).ConfigureAwait(false), httpContext, false);
                 }
             }
             catch (Exception e)
