@@ -1,7 +1,7 @@
 # TinyHealthCheck
 A very small library for adding health checks to C# ServiceWorkers. It can be used anywhere you want a health check endpoint, but
 don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), and utilizes a low priority thread pool 
-for low impact on your service worker processes.
+for minimal impact on your service worker processes.
 
 [![Generic badge](https://img.shields.io/badge/Nuget-Download-Blue.svg)](https://www.nuget.org/packages/TinyHealthCheck/)
 
@@ -124,6 +124,9 @@ This will return the following body:
     "CustomValue": "SomeValueFromServices"
 }
 ```
+
+## Example
+A complete example can be found in the `DummyServiceWorker` directory.
 
 ## Hostname consideration
 By default, the `hostname` parameter is set to `localhost`. This will work fine for local development, but will not work across the network.
