@@ -51,7 +51,7 @@ namespace TinyHealthCheck
 
             _logger.LogInformation($"TinyHealthCheck recieved a request from {request.RemoteEndPoint}");
 
-            if (request.HttpMethod.ToUpper() != "GET" || request.Url.PathAndQuery != _config.UrlPath)
+            if (!request.HttpMethod.Equals("GET", StringComparison.InvariantCultureIgnoreCase) || !request.Url.PathAndQuery.Equals(_config.UrlPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 response.StatusCode = 404;
                 response.Close();
