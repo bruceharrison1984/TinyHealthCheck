@@ -79,6 +79,10 @@ Calling `AddCustomTinyHealthCheck` with a class that inheirits from IHealthCheck
 It also allows you to leverage DI to gain access to values from your other DI service containers. You could use this to get queue lengths,
 check if databases are accessible, etc.
 
+The return value of `Execute` is a string. It will be converted in to a byte[] and sent as the response. It can be any wire format you choose(json/xml/html/etc), 
+just make sure to assign the appropriate `ContentType` for your health check client when you define the health check in CreateHostBuilder. The default ContentType 
+is `application/json`.
+
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
 {
