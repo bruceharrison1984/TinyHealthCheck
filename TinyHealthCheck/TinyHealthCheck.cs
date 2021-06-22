@@ -59,14 +59,14 @@ namespace TinyHealthCheck
                     return;
                 };
 
-                var responseBody = await _healthCheck.Execute(cancellationToken);
+                var responseBody = await _healthCheck.Execute(cancellationToken).ConfigureAwait(false);
 
                 response.ContentType = _config.ContentType;
                 response.ContentEncoding = Encoding.UTF8;
                 byte[] data = Encoding.UTF8.GetBytes(responseBody);
 
                 response.ContentLength64 = data.LongLength;
-                await response.OutputStream.WriteAsync(data, cancellationToken);
+                await response.OutputStream.WriteAsync(data, cancellationToken).ConfigureAwait(false);
             }
         }
     }
