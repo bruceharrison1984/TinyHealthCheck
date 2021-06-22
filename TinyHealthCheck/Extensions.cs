@@ -7,19 +7,23 @@ namespace TinyHealthCheck
 {
     public static class Extensions
     {
-        public static IServiceCollection AddBasicTinyHealthCheck(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction)
+        public static IServiceCollection AddBasicTinyHealthCheck(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configFunc)
         {
-            return services.AddCustomTinyHealthCheck<BasicHealthCheck>(configAction);
+            return services.AddCustomTinyHealthCheck<BasicHealthCheck>(configFunc);
         }
 
-        public static IServiceCollection AddBasicTinyHealthCheckWithUptime(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction)
+        public static IServiceCollection AddBasicTinyHealthCheckWithUptime(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configFunc)
         {
-            return services.AddCustomTinyHealthCheck<BasicHealthCheckWithUptime>(configAction);
+            return services.AddCustomTinyHealthCheck<BasicHealthCheckWithUptime>(configFunc);
         }
 
-        public static IServiceCollection AddCustomTinyHealthCheck<T>(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configAction) where T : IHealthCheck, new()
+        public static IServiceCollection AddCustomTinyHealthCheck<T>(this IServiceCollection services, Func<TinyHealthCheckConfig, TinyHealthCheckConfig> configFunc) where T : IHealthCheck
         {
-            return services.AddSingleton<IHostedService>(x => ActivatorUtilities.CreateInstance<HealthCheckService<T>>(x, configAction(new TinyHealthCheckConfig())));
+            return services.AddSingleton<IHostedService>(x =>
+            {
+                var healthCheck = ActivatorUtilities.CreateInstance<T>(x);
+                return ActivatorUtilities.CreateInstance<HealthCheckService<T>>(x, healthCheck, configFunc(new TinyHealthCheckConfig()));
+            });
         }
     }
 }

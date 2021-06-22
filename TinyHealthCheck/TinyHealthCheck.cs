@@ -9,18 +9,18 @@ using TinyHealthCheck.HealthChecks;
 
 namespace TinyHealthCheck
 {
-    public class HealthCheckService<T> : BackgroundService where T : IHealthCheck, new()
+    public class HealthCheckService<T> : BackgroundService where T : IHealthCheck
     {
         private readonly ILogger<HealthCheckService<T>> _logger;
         private readonly TinyHealthCheckConfig _config;
         private readonly T _healthCheck;
         private readonly HttpListener _listener = new HttpListener();
 
-        public HealthCheckService(ILogger<HealthCheckService<T>> logger, TinyHealthCheckConfig config)
+        public HealthCheckService(ILogger<HealthCheckService<T>> logger, T healthCheck, TinyHealthCheckConfig config)
         {
             _logger = logger;
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _healthCheck = new T();
+            _healthCheck = healthCheck;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -30,17 +30,13 @@ namespace TinyHealthCheck
                 _listener.Prefixes.Add($"http://{_config.Hostname}:{_config.Port}/");
                 _listener.Start();
 
-                _logger.LogInformation($"TinyHealthCheck started on port '{_config.Port}'");
+                _logger.LogInformation($"TinyHealthCheck<{typeof(T).Name}> started on port '{_config.Port}'");
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var httpContext = await _listener.GetContextAsync();
                     ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck(x, cancellationToken), httpContext, false);
                 }
-            }
-            catch (HttpListenerException e)
-            {
-                _logger.LogError(e, $"Port '{_config.Port}' is already occupied by another process");
             }
             catch (Exception e)
             {
