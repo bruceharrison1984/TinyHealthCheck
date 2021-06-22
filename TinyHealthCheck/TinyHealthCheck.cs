@@ -47,27 +47,27 @@ namespace TinyHealthCheck
         private async Task ProcessHealthCheck(HttpListenerContext client, CancellationToken cancellationToken)
         {
             var request = client.Request;
-            var response = client.Response;
 
             _logger.LogInformation($"TinyHealthCheck recieved a request from {request.RemoteEndPoint}");
 
-            if (!request.HttpMethod.Equals("GET", StringComparison.InvariantCultureIgnoreCase) || !request.Url.PathAndQuery.Equals(_config.UrlPath, StringComparison.InvariantCultureIgnoreCase))
+            using (var response = client.Response)
             {
-                response.StatusCode = 404;
-                response.Close();
-                return;
-            };
+                if (!request.HttpMethod.Equals("GET", StringComparison.InvariantCultureIgnoreCase)
+                    || !request.Url.PathAndQuery.Equals(_config.UrlPath, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    response.StatusCode = 404;
+                    return;
+                };
 
-            var responseBody = await _healthCheck.Execute(cancellationToken);
+                var responseBody = await _healthCheck.Execute(cancellationToken);
 
-            response.ContentType = _config.ContentType;
-            response.ContentEncoding = Encoding.UTF8;
-            byte[] data = Encoding.UTF8.GetBytes(responseBody);
+                response.ContentType = _config.ContentType;
+                response.ContentEncoding = Encoding.UTF8;
+                byte[] data = Encoding.UTF8.GetBytes(responseBody);
 
-            response.ContentLength64 = data.LongLength;
-            await response.OutputStream.WriteAsync(data, cancellationToken);
-
-            response.Close();
+                response.ContentLength64 = data.LongLength;
+                await response.OutputStream.WriteAsync(data, cancellationToken);
+            }
         }
     }
 }
