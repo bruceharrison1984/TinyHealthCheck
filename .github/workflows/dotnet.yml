@@ -2,9 +2,12 @@ name: .NET
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '*' ]
     paths:
       - "TinyHealthCheck/**"
+      - "Tests/**"
+      - "DummyServiceWorker/**"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,5 +34,6 @@ jobs:
     - name: Package Nuget
       run: dotnet pack -p:PackageVersion=0.0.${{ github.run_number }} -o ./output
 
-    - name: Push Nuget Package
-      run: dotnet nuget push ./output/TinyHealthCheck.0.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+    # - name: Push Nuget Package
+    #   run: dotnet nuget push ./output/TinyHealthCheck.0.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+    #   if: github.ref == 'refs/heads/main'
