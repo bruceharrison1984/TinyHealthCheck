@@ -86,7 +86,7 @@ Calling `AddCustomTinyHealthCheck` with a class that inheirits from IHealthCheck
 It also allows you to leverage DI to gain access to values from your other DI service containers. You could use this to get queue lengths,
 check if databases are accessible, etc.
 
-The return value of `Execute` is a `HealthCheckResult`. The Body will be converted in to a byte[], and the StatusCode will be applied to the response. The Body
+The return value of `ExecuteAsync` is a `HealthCheckResult`. The Body will be converted in to a byte[], and the StatusCode will be applied to the response. The Body
 can be any wire format you choose(json/xml/html/etc), just make sure to assign the appropriate `ContentType` that your health check client expects when you define
 the health check in CreateHostBuilder. The default ContentType is `application/json`.
 
@@ -130,7 +130,7 @@ public static IHostBuilder CreateHostBuilder(string[] args)
         _workerStateService = workerStateService;
     }
 
-    public async Task<HealthCheckResult> Execute(CancellationToken cancellationToken)
+    public async Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
 
