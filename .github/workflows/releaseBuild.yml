@@ -2,12 +2,8 @@ name: .NET
 
 on:
   push:
-    branches: [ '*' ]
-    paths:
-      - "TinyHealthCheck/**"
-      - "Tests/**"
-      - "DummyServiceWorker/**"
-  workflow_dispatch:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -16,6 +12,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Set env
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - name: Test
+      run: |
+        echo $RELEASE_VERSION
+        echo ${{ env.RELEASE_VERSION }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -37,3 +40,14 @@ jobs:
     # - name: Push Nuget Package
     #   run: dotnet nuget push ./output/TinyHealthCheck.0.0.${{ github.run_number }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
     #   if: github.ref == 'refs/heads/main'
+
+    ## Checkout so we can apply the new tag
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: "0"
+
+    ## Documentation: https://github.com/marvinpinto/action-automatic-releases
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
