@@ -6,7 +6,9 @@ namespace TinyHealthCheck.HealthChecks
 {
     public class BasicHealthCheck : IHealthCheck
     {
-        public async Task<HealthCheckResult> Execute(CancellationToken cancellationToken)
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             return new HealthCheckResult
             {

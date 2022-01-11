@@ -5,6 +5,6 @@ namespace TinyHealthCheck.HealthChecks
 {
     public interface IHealthCheck
     {
-        Task<HealthCheckResult> Execute(CancellationToken cancellationToken);
+        Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken);
     }
 }

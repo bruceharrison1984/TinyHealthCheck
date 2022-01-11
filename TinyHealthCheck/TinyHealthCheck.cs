@@ -59,7 +59,7 @@ namespace TinyHealthCheck
                     return;
                 };
 
-                var healthCheckResult = await _healthCheck.Execute(cancellationToken).ConfigureAwait(false);
+                var healthCheckResult = await _healthCheck.ExecuteAsync(cancellationToken).ConfigureAwait(false);
 
                 response.ContentType = _config.ContentType;
                 response.ContentEncoding = _config.ContentEncoding;
