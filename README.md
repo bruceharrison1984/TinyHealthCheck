@@ -1,23 +1,28 @@
 # TinyHealthCheck
-A very small library for adding health checks to C# Service Workers or other headless processes running in a container. It can be used 
-anywhere you want a health check endpoint, but don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2), 
+
+A very small library for adding health checks to C# Service Workers or other headless processes running in a container. It can be used
+anywhere you want a health check endpoint, but don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(2),
 and utilizes a low priority thread pool for minimal impact on your service worker processes.
 
 [![Generic badge](https://img.shields.io/badge/Nuget-Download-blue.svg)](https://www.nuget.org/packages/TinyHealthCheck/)
+![Build Badge](https://img.shields.io/github/workflow/status/bruceharrison1984/TinyHealthCheck/Development%20Build/main)
 
 ## Notes
- - This health check is meant to be used for internal/private health checks only
-    - Expose it to the internet at your own peril
- - **Only GET operations are supported**
-    - I have no plans to support other HttpMethods
- - Only one endpoint per port is allowed, as well as one UrlPath per port
-    - This library was created for Service Workers that normally have *no* usable HTTP web server
-    - This library creates endpoints without *any* of the MVC packages
-        - This means no middleware, auth, validation, etc
-    - You can run different HealthChecks on different ports
+
+- This health check is meant to be used for internal/private health checks only
+  - Expose it to the internet at your own peril
+- **Only GET operations are supported**
+  - I have no plans to support other HttpMethods
+- Only one endpoint per port is allowed, as well as one UrlPath per port
+  - This library was created for Service Workers that normally have _no_ usable HTTP web server
+  - This library creates endpoints without _any_ of the MVC packages
+    - This means no middleware, auth, validation, etc
+  - You can run different HealthChecks on different ports
 
 ## Simple Usage
+
 Simply add the TinyHealthCheck as a Hosted Service by calling the extension methods to have it run as a background process:
+
 ```csharp
 public static IHostBuilder CreateHostBuilder(string[] args)
 {
@@ -37,13 +42,15 @@ public static IHostBuilder CreateHostBuilder(string[] args)
 ```
 
 This will create an endpoint on `http://localhost:8080/healthz` with the following response body:
+
 ```json
 {
-    "Status": "Healthy!"
+  "Status": "Healthy!"
 }
 ```
 
 ## Uptime Monitor Endpoint
+
 Call `AddBasicTinyHealthCheckWithUptime` to add an uptime counter to the output:
 
 ```csharp
@@ -65,23 +72,26 @@ public static IHostBuilder CreateHostBuilder(string[] args)
 ```
 
 This will create an endpoint on `http://localhost:8081/healthz` with the following response body:
+
 ```json
 {
-    "Status": "Healthy!",
-    "Uptime": "<ever increasing timespan>"
+  "Status": "Healthy!",
+  "Uptime": "<ever increasing timespan>"
 }
 ```
 
 ## Advanced Usage
+
 Calling `AddCustomTinyHealthCheck` with a class that inheirits from IHealthCheck allows you to create whatever type of response you want.
 It also allows you to leverage DI to gain access to values from your other DI service containers. You could use this to get queue lengths,
 check if databases are accessible, etc.
 
-The return value of `Execute` is a `HealthCheckResult`. The Body will be converted in to a byte[], and the StatusCode will be applied to the response. The Body 
-can be any wire format you choose(json/xml/html/etc), just make sure to assign the appropriate `ContentType` that your health check client expects when you define 
+The return value of `Execute` is a `HealthCheckResult`. The Body will be converted in to a byte[], and the StatusCode will be applied to the response. The Body
+can be any wire format you choose(json/xml/html/etc), just make sure to assign the appropriate `ContentType` that your health check client expects when you define
 the health check in CreateHostBuilder. The default ContentType is `application/json`.
 
 ### IHostedService Note
+
 If you are using a IHostedService, you will require a secondary service to hold the state of your IHostedService. This is because you cannot
 reliably retrieve IHostedService from the `IServiceProvider` interface. [See this StackOverflow post](https://stackoverflow.com/a/52038409/889034).
 There is a complete example of this in the `DummyServiceWorker` project.
@@ -150,37 +160,45 @@ public static IHostBuilder CreateHostBuilder(string[] args)
     }
 }
 ```
+
 This will return the following body:
+
 ```json
 //StatusCode 200
 {
-    "Status": "Healthy!",
-    "Iteration": 3,
-    "IsServiceRunning": true
+  "Status": "Healthy!",
+  "Iteration": 3,
+  "IsServiceRunning": true
 }
 ```
+
 As well as print a message in the application console:
+
 ```sh
 info: DummyServiceWorker.Program.CustomHealthCheck[0]
       This is an example of accessing the DI containers for logging. You can access any service that is registered
 ```
+
 Once 10 iterations have been exceeded, the response will change:
+
 ```json
 //StatusCode 500
 {
-    "Status": "Unhealthy!",
-    "Iteration": 10,
-    "IsServiceRunning": false,
-    "ErrorMessage": "We went over 10 iterations, so the service worker quit!"
+  "Status": "Unhealthy!",
+  "Iteration": 10,
+  "IsServiceRunning": false,
+  "ErrorMessage": "We went over 10 iterations, so the service worker quit!"
 }
 ```
 
 ## Example
+
 A complete example can be found in the `DummyServiceWorker` directory.
 
 ## Hostname consideration
+
 By default, the `hostname` parameter is set to `localhost`. This will work fine for local development, but will not work across the network.
 To allow listening on all interfaces, you must set hostname to `*`. There are also security implications to doing this, which is why it is not
 recommended to expose these health check endpoints to the internet.
 
-**On windows, you must run the process as an administrator to use * as the hostname! Failure to do this will result in the TinyHealthCheck process failing**
+**On windows, you must run the process as an administrator to use \* as the hostname! Failure to do this will result in the TinyHealthCheck process failing**
