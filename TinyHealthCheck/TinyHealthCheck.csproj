@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <PackageProjectUrl>https://github.com/bruceharrison1984/TinyHealthCheck</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bruceharrison1984/TinyHealthCheck</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
