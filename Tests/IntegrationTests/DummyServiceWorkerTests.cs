@@ -53,13 +53,15 @@ namespace UnitTests.IntegrationTests
             Assert.That(result.json.Iteration, Is.EqualTo(0));
 
             //run on another thread so sleeping doesn't also sleep the DummyHealthCheck process
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 Thread.Sleep(new TimeSpan(0,0,26));
-                Assert.That(() => QueryHealthCheckEndpoint<CustomHealthCheckResponse>("http://localhost:8082/healthz").Result.response.IsSuccessStatusCode, Is.False);
-                Assert.That(() => QueryHealthCheckEndpoint<CustomHealthCheckResponse>("http://localhost:8082/healthz").Result.json.Status, Is.EqualTo("Unhealthy!"));
-                Assert.That(() => QueryHealthCheckEndpoint<CustomHealthCheckResponse>("http://localhost:8082/healthz").Result.json.Iteration, Is.EqualTo(10));
-                Assert.That(() => QueryHealthCheckEndpoint<CustomHealthCheckResponse>("http://localhost:8082/healthz").Result.json.IsServiceRunning, Is.False);
+                var secondResult = await QueryHealthCheckEndpoint<CustomHealthCheckResponse>("http://localhost:8082/healthz");
+
+                Assert.IsFalse(secondResult.response.IsSuccessStatusCode);
+                Assert.AreEqual(secondResult.json.Status, "Unhealthy!");
+                Assert.AreEqual(secondResult.json.Iteration, 10);
+                Assert.IsFalse(secondResult.json.IsServiceRunning);
             });
         }
 
