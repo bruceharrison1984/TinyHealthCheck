@@ -12,6 +12,7 @@
     <Description>
       Dead simple HTTP health checks without the MVC framework.
     </Description>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
