@@ -94,7 +94,8 @@ the health check in CreateHostBuilder. The default ContentType is `application/j
 
 If you are using a IHostedService, you will require a secondary service to hold the state of your IHostedService. This is because you cannot
 reliably retrieve IHostedService from the `IServiceProvider` interface. [See this StackOverflow post](https://stackoverflow.com/a/52038409/889034).
-There is a complete example of this in the `DummyServiceWorker` project.
+There is a complete example of this in the `DummyServiceWorker` project, as well as a Dockerfile that demonstrates running TinyHealthCheck from
+a Linux environment.
 
 In the example you'll notice that while the HealthCheck on localhost:8082 fails after 10 iterations, the other HealthChecks still report success. A custom
 health check like this allows you to monitor another process from out-of-band, and report when it has failed.

@@ -13,10 +13,10 @@ namespace UnitTests.IntegrationTests
     [TestFixture]
     public class DummyServiceWorkerTests
     {
-        [SetUp]
+        [OneTimeSetUp]
         public async Task Setup()
         {
-            var hostProcess = DummyServiceWorker.Program.CreateHostBuilder(null);
+            var hostProcess = DummyServiceWorker.Program.CreateHostBuilder(new string[] { "localhost" });
             await hostProcess.Build().StartAsync();
         }
 

@@ -17,8 +17,12 @@ namespace DummyServiceWorker
             CreateHostBuilder(args).Build().Run();
         }
 
+        //First arg is hostname so we can easily run integration tests
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            var hostName = "*";
+            if (args.Length > 0) hostName = args[0];
+
             var processStartTime = DateTimeOffset.Now;
             return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
@@ -28,16 +32,19 @@ namespace DummyServiceWorker
                     services.AddBasicTinyHealthCheck(config =>
                     {
                         config.Port = 8080;
+                        config.Hostname = hostName;
                         return config;
                     });
                     services.AddBasicTinyHealthCheckWithUptime(config =>
                     {
                         config.Port = 8081;
+                        config.Hostname = hostName;
                         return config;
                     });
                     services.AddCustomTinyHealthCheck<CustomHealthCheck>(config =>
                     {
                         config.Port = 8082;
+                        config.Hostname = hostName;
                         return config;
                     });
                 });
