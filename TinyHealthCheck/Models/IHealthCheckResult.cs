@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 
 namespace TinyHealthCheck.Models
 {
@@ -17,5 +18,15 @@ namespace TinyHealthCheck.Models
         /// HTTP response code that will be returned to the client
         /// </summary>
         HttpStatusCode StatusCode { get; set; }
+
+        /// <summary>
+        /// The ContentType that the response will be returned as
+        /// </summary>
+        public string ContentType { get; }
+
+        /// <summary>
+        /// The encoding of the response. The default(UTF8) should be fine except in special scenarios.
+        /// </summary>
+        public Encoding ContentEncoding { get; }
     }
 }

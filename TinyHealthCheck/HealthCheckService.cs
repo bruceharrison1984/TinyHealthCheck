@@ -73,8 +73,8 @@ namespace TinyHealthCheck
 
                 var healthCheckResult = await _healthCheck.ExecuteAsync(cancellationToken).ConfigureAwait(false);
 
-                response.ContentType = _config.ContentType;
-                response.ContentEncoding = _config.ContentEncoding;
+                response.ContentType = healthCheckResult.ContentType;
+                response.ContentEncoding = healthCheckResult.ContentEncoding;
 
                 response.StatusCode = (int)healthCheckResult.StatusCode;
                 byte[] data = Encoding.UTF8.GetBytes(healthCheckResult.Body);

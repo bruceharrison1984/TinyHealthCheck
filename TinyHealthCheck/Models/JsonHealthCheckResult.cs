@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace TinyHealthCheck.Models
@@ -20,5 +21,11 @@ namespace TinyHealthCheck.Models
 
         /// <inheritdoc/>
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
+
+        /// <inheritdoc/>
+        public string ContentType { get; } = "application/json";
+
+        /// <inheritdoc/>
+        public Encoding ContentEncoding { get; } = Encoding.UTF8;
     }
 }

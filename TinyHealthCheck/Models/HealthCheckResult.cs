@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text;
 
 namespace TinyHealthCheck.Models
 {
@@ -19,5 +20,11 @@ namespace TinyHealthCheck.Models
 
         /// <inheritdoc/>
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
+
+        /// <inheritdoc/>
+        public string ContentType { get; } = "text/plain";
+
+        /// <inheritdoc/>
+        public Encoding ContentEncoding { get; } = Encoding.UTF8;
     }
 }
