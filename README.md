@@ -118,12 +118,13 @@ public static IHostBuilder CreateHostBuilder(string[] args)
         });
 }
 
- public class CustomHealthCheck : IHealthCheck
+public class CustomHealthCheck : IHealthCheck
 {
     private readonly ILogger<CustomHealthCheck> _logger;
     private readonly WorkerStateService _workerStateService;
     //IHostedServices cannot be reliably retrieved from the DI collection
     //A secondary stateful service is required in order to get state information out of it
+    //https://stackoverflow.com/a/52038409/889034
 
     public CustomHealthCheck(ILogger<CustomHealthCheck> logger, WorkerStateService workerStateService)
     {
@@ -131,33 +132,29 @@ public static IHostBuilder CreateHostBuilder(string[] args)
         _workerStateService = workerStateService;
     }
 
-    public async Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
+    public async Task<IHealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
 
         if (_workerStateService.IsRunning)
-            return new HealthCheckResult
-            {
-                Body = JsonSerializer.Serialize(new
+            return new JsonHealthCheckResult(
+                new
                 {
                     Status = "Healthy!",
                     Iteration = _workerStateService.Iteration,
                     IsServiceRunning = _workerStateService.IsRunning,
-                }),
-                StatusCode = System.Net.HttpStatusCode.OK
-            };
+                },
+                HttpStatusCode.OK);
 
-        return new HealthCheckResult
-        {
-            Body = JsonSerializer.Serialize(new
+        return new JsonHealthCheckResult(
+            new
             {
                 Status = "Unhealthy!",
                 Iteration = _workerStateService.Iteration,
                 IsServiceRunning = _workerStateService.IsRunning,
                 ErrorMessage = "We went over 10 iterations, so the service worker quit!"
-            }),
-            StatusCode = System.Net.HttpStatusCode.InternalServerError
-        };
+            },
+            HttpStatusCode.InternalServerError);
     }
 }
 ```

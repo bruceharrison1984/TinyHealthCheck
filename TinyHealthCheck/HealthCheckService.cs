@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TinyHealthCheck.HealthChecks;
+using TinyHealthCheck.Models;
 
 namespace TinyHealthCheck
 {
@@ -23,6 +24,11 @@ namespace TinyHealthCheck
             _healthCheck = healthCheck;
         }
 
+        /// <summary>
+        /// Start the HTTP Listener loop. Runs indefinitely.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to stop the listener</param>
+        /// <returns><see cref="Task"/></returns>
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             try
@@ -44,6 +50,12 @@ namespace TinyHealthCheck
             }
         }
 
+        /// <summary>
+        /// The process that returns responses to clients.
+        /// </summary>
+        /// <param name="client">HttpListenerContext that listens for HTTP requests</param>
+        /// <param name="cancellationToken">Token that can be used to stop the listener</param>
+        /// <returns><see cref="Task"/></returns>
         private async Task ProcessHealthCheck(HttpListenerContext client, CancellationToken cancellationToken)
         {
             var request = client.Request;

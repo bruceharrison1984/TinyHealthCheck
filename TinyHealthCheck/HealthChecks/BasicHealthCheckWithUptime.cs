@@ -1,17 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using TinyHealthCheck.Models;
 
 namespace TinyHealthCheck.HealthChecks
 {
+    /// <summary>
+    /// This health check returns a simple 'Healthy' status, as well as an uptime counter.
+    /// </summary>
     public class BasicHealthCheckWithUptime : IHealthCheck
     {
         private DateTimeOffset processStartTime = DateTimeOffset.Now;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
+        public async Task<IHealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             var responseBody = new
@@ -20,11 +25,7 @@ namespace TinyHealthCheck.HealthChecks
                 Uptime = (DateTimeOffset.Now - processStartTime).ToString()
             };
 
-            return new HealthCheckResult
-            {
-                Body = JsonSerializer.Serialize(responseBody),
-                StatusCode = System.Net.HttpStatusCode.OK
-            };
+            return new JsonHealthCheckResult(responseBody, HttpStatusCode.OK);
         }
     }
 }

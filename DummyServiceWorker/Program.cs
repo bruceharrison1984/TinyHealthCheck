@@ -2,11 +2,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Text.Json;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using TinyHealthCheck;
 using TinyHealthCheck.HealthChecks;
+using TinyHealthCheck.Models;
 
 namespace DummyServiceWorker
 {
@@ -65,34 +66,30 @@ namespace DummyServiceWorker
             }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-            public async Task<HealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
+            public async Task<IHealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
             {
                 _logger.LogInformation("This is an example of accessing the DI containers for logging. You can access any service that is registered");
 
                 if (_workerStateService.IsRunning)
-                    return new HealthCheckResult
-                    {
-                        Body = JsonSerializer.Serialize(new
-                        {
-                            Status = "Healthy!",
-                            Iteration = _workerStateService.Iteration,
-                            IsServiceRunning = _workerStateService.IsRunning,
-                        }),
-                        StatusCode = System.Net.HttpStatusCode.OK
-                    };
+                    return new JsonHealthCheckResult(
+                       new
+                       {
+                           Status = "Healthy!",
+                           Iteration = _workerStateService.Iteration,
+                           IsServiceRunning = _workerStateService.IsRunning,
+                       },
+                       HttpStatusCode.OK);
 
-                return new HealthCheckResult
-                {
-                    Body = JsonSerializer.Serialize(new
+                return new JsonHealthCheckResult(
+                    new
                     {
                         Status = "Unhealthy!",
                         Iteration = _workerStateService.Iteration,
                         IsServiceRunning = _workerStateService.IsRunning,
                         ErrorMessage = "We went over 10 iterations, so the service worker quit!"
-                    }),
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError
-                };
+                    },
+                    HttpStatusCode.InternalServerError);
             }
         }
     }

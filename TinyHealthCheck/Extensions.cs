@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System;
 using TinyHealthCheck.HealthChecks;
+using TinyHealthCheck.Models;
 
 namespace TinyHealthCheck
 {
