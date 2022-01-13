@@ -193,6 +193,15 @@ Once 10 iterations have been exceeded, the response will change:
 
 A complete example can be found in the `DummyServiceWorker` directory.
 
+## Response Interface
+
+The `IHealthCheckResult` interface is used for returning the response data to the client. Two concrete result types are included:
+
+- An open-ended `HealthCheckResult` that requires you to serialize the payload however you require
+- The `JsonHealthCheckResult` accepts an object and automatically serializes it into JSON
+
+Inheiriting from the `IHealthCheckResult` makes it easy to create a custom implementation to return a response body of any serialization scheme.
+
 ## Hostname consideration
 
 By default, the `hostname` parameter is set to `localhost`. This will work fine for local development, but will not work across the network.

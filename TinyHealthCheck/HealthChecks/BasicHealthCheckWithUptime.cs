@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Net;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using TinyHealthCheck.Models;
@@ -16,6 +14,7 @@ namespace TinyHealthCheck.HealthChecks
         private DateTimeOffset processStartTime = DateTimeOffset.Now;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        /// <inheritdoc/>
         public async Task<IHealthCheckResult> ExecuteAsync(CancellationToken cancellationToken)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {

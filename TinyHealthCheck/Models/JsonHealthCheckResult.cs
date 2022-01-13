@@ -3,9 +3,7 @@ using System.Text.Json;
 
 namespace TinyHealthCheck.Models
 {
-    /// <summary>
-    /// Container to hold the response data for an IHealthCheck. Automatically serializes the response object into JSON.
-    /// </summary>
+    /// <inheritdoc/>
     public class JsonHealthCheckResult : IHealthCheckResult
     {
         /// <summary>
@@ -17,14 +15,10 @@ namespace TinyHealthCheck.Models
             StatusCode = statusCode;
         }
 
-        /// <summary>
-        /// JSON response body
-        /// </summary>
+        /// <inheritdoc/>
         public string Body { get; set; }
 
-        /// <summary>
-        /// HTTP response code that will be returned to the client
-        /// </summary>
+        /// <inheritdoc/>
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
     }
 }
