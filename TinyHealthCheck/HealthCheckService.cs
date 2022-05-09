@@ -60,7 +60,7 @@ namespace TinyHealthCheck
         {
             var request = client.Request;
 
-            _logger.LogInformation($"TinyHealthCheck recieved a request from {request.RemoteEndPoint}");
+            _logger.LogInformation($"TinyHealthCheck received a request from {request.RemoteEndPoint}");
 
             using (var response = client.Response)
             {
