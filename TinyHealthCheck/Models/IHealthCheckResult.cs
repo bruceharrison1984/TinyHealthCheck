@@ -22,11 +22,11 @@ namespace TinyHealthCheck.Models
         /// <summary>
         /// The ContentType that the response will be returned as
         /// </summary>
-        public string ContentType { get; }
+        string ContentType { get; }
 
         /// <summary>
         /// The encoding of the response. The default(UTF8) should be fine except in special scenarios.
         /// </summary>
-        public Encoding ContentEncoding { get; }
+        Encoding ContentEncoding { get; }
     }
 }

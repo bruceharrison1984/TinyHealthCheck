@@ -41,7 +41,7 @@ namespace TinyHealthCheck
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var httpContext = await _listener.GetContextAsync().ConfigureAwait(false);
-                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck(x, cancellationToken).ConfigureAwait(false), httpContext, false);
+                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck((HttpListenerContext)x, cancellationToken).ConfigureAwait(false), httpContext);
                 }
             }
             catch (Exception e)
@@ -80,7 +80,7 @@ namespace TinyHealthCheck
                 byte[] data = Encoding.UTF8.GetBytes(healthCheckResult.Body);
 
                 response.ContentLength64 = data.LongLength;
-                await response.OutputStream.WriteAsync(data, cancellationToken).ConfigureAwait(false);
+                await response.OutputStream.WriteAsync(data, 0, data.Length, cancellationToken).ConfigureAwait(false);
             }
         }
     }
