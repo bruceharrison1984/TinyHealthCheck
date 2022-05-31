@@ -1,6 +1,6 @@
 # TinyHealthCheck
 
-A very small library for adding health checks to C# Service Workers or other headless processes running in a container. It can be used
+A very small library for adding health checks to C# Service Workers or other headless processes. It can be used
 anywhere you want a health check endpoint, but don't want to drag in the entire MVC ecosystem to support it. It has very few dependencies(3),
 and utilizes a low priority thread pool for minimal impact on your service worker processes.
 
