@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<UserSecretsId>dotnet-DummyServiceWorker-4B7A2D48-2FC8-47D3-85F2-3EC363843E8E</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
 		<DockerLaunchUrl>http://localhost:8080/healthz</DockerLaunchUrl>
 		<DockerfileRunArguments>-p 8080:8080 -p 8081:8081 -p 8082:8082</DockerfileRunArguments>
+		<LangVersion>11</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

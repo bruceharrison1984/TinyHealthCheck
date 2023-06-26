@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageProjectUrl>https://github.com/bruceharrison1984/TinyHealthCheck</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bruceharrison1984/TinyHealthCheck</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -13,6 +13,7 @@
       Dead simple HTTP health checks without the MVC framework.
     </Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
