@@ -18,6 +18,7 @@ and utilizes a low priority thread pool for minimal impact on your service worke
   - This library creates endpoints without _any_ of the MVC packages
     - This means no middleware, auth, validation, etc
   - You can run different HealthChecks on different ports
+- Docker containers may have trouble using `localhost` for the hostname, it's reccomended to use `*` or `+` instead, [see this stackoverflow for more information](https://stackoverflow.com/questions/75961828/c-sharp-net-core-7-http-listener-app-wrapped-in-docker-cannot-be-reached-from)
 
 ## Simple Usage
 
