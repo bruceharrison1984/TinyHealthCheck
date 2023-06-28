@@ -5,7 +5,7 @@ anywhere you want a health check endpoint, but don't want to drag in the entire 
 and utilizes a low priority thread pool for minimal impact on your service worker processes.
 
 [![Nuget](https://img.shields.io/nuget/dt/tinyhealthcheck?color=blue&label=nuget%20downloads)](https://www.nuget.org/packages/TinyHealthCheck/)
-[![Build Badge](https://img.shields.io/github/workflow/status/bruceharrison1984/TinyHealthCheck/Development%20Build/main)](https://github.com/bruceharrison1984/TinyHealthCheck/actions/workflows/devBuild.yml)
+[![Build Badge](https://img.shields.io/github/actions/workflow/status/bruceharrison1984/TinyHealthCheck/devBuild.yml)
 
 ## Notes
 
