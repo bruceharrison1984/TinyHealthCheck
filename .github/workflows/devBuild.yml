@@ -17,6 +17,16 @@ jobs:
       id: getReleaseVersion
       run: echo ::set-output name=tag::${GITHUB_REF#refs/*/v}
 
+    - name: Get Release Version
+      id: getReleaseVersion-new
+      run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
+
+    - name: Echo version
+      run: echo ${{ steps.getReleaseVersion.outputs.tag }}
+
+    - name: Echo version
+      run: echo ${{ steps.getReleaseVersion-new.outputs.tag }}
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
