@@ -38,10 +38,13 @@ namespace TinyHealthCheck
 
                 _logger.LogInformation($"TinyHealthCheck<{typeof(T).Name}> started on port '{_config.Port}'");
 
+                var cancelTask = Task.Delay(Timeout.Infinite, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var httpContext = await _listener.GetContextAsync().ConfigureAwait(false);
-                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck((HttpListenerContext)x, cancellationToken).ConfigureAwait(false), httpContext);
+                    var httpContextTask = _listener.GetContextAsync();
+                    var completedTask = await Task.WhenAny(httpContextTask, cancelTask).ConfigureAwait(false);
+                    if(completedTask == cancelTask) break;
+                    ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck((HttpListenerContext)x, cancellationToken).ConfigureAwait(false), httpContextTask.Result);
                 }
             }
             catch (Exception e)
