@@ -53,7 +53,7 @@ namespace TinyHealthCheck
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "TinyHealthCheck had an exception!");
+                _logger.LogError(e, "TinyHealthCheck<{TypeName}> encountered an exception!", _typeName);
             }
         }
 
