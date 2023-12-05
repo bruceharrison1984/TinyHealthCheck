@@ -36,7 +36,7 @@ namespace TinyHealthCheck
                 _listener.Prefixes.Add($"http://{_config.Hostname}:{_config.Port}/");
                 _listener.Start();
 
-                _logger.LogInformation($"TinyHealthCheck<{typeof(T).Name}> started on port '{_config.Port}'");
+                _logger.Log(_config.LogLevel, $"TinyHealthCheck<{typeof(T).Name}> started on port '{_config.Port}'");
 
                 var cancelTask = Task.Delay(Timeout.Infinite, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
@@ -63,7 +63,7 @@ namespace TinyHealthCheck
         {
             var request = client.Request;
 
-            _logger.LogInformation($"TinyHealthCheck received a request from {request.RemoteEndPoint}");
+            _logger.Log(_config.LogLevel, $"TinyHealthCheck received a request from {request.RemoteEndPoint}");
 
             using (var response = client.Response)
             {
