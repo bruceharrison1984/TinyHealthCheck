@@ -16,6 +16,7 @@ namespace TinyHealthCheck
         private readonly TinyHealthCheckConfig _config;
         private readonly T _healthCheck;
         private readonly HttpListener _listener = new HttpListener();
+        
         private readonly string _typeName;
 
         public HealthCheckService(ILogger<HealthCheckService<T>> logger, T healthCheck, TinyHealthCheckConfig config)
