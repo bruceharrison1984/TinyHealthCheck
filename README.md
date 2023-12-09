@@ -203,6 +203,23 @@ The `IHealthCheckResult` interface is used for returning the response data to th
 
 Inheiriting from the `IHealthCheckResult` makes it easy to create a custom implementation to return a response body of any serialization scheme.
 
+## Logging
+
+All log messages happen with `Debug` log-level, so they will likely not appear in your logs. If you wish to see them, you can explictly change the log
+level via `appsettings.json`.
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      ...
+      "TinyHealthCheck": "Debug"
+      ...
+    }
+  }
+}
+```
+
 ## Hostname consideration
 
 By default, the `hostname` parameter is set to `localhost`. This will work fine for local development, but will not work across the network.
