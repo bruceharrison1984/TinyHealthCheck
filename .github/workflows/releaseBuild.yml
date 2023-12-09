@@ -67,7 +67,7 @@ jobs:
           name: nuget-package
 
       - name: dir
-        run: ls -lha
+        run: ls -lha ./package
       # - name: Push Nuget Package
       #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
 
