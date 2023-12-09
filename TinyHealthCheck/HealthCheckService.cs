@@ -16,12 +16,16 @@ namespace TinyHealthCheck
         private readonly TinyHealthCheckConfig _config;
         private readonly T _healthCheck;
         private readonly HttpListener _listener = new HttpListener();
+        
+        private readonly string _typeName;
 
         public HealthCheckService(ILogger<HealthCheckService<T>> logger, T healthCheck, TinyHealthCheckConfig config)
         {
             _logger = logger;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _healthCheck = healthCheck;
+            
+            _typeName = typeof(T).Name;
         }
 
         /// <summary>
@@ -36,7 +40,7 @@ namespace TinyHealthCheck
                 _listener.Prefixes.Add($"http://{_config.Hostname}:{_config.Port}/");
                 _listener.Start();
 
-                _logger.LogInformation($"TinyHealthCheck<{typeof(T).Name}> started on port '{_config.Port}'");
+                _logger.Log(_config.LogLevel, "TinyHealthCheck<{TypeName}> started on port {Port}", _typeName, _config.Port);
 
                 var cancelTask = Task.Delay(Timeout.Infinite, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
@@ -49,7 +53,7 @@ namespace TinyHealthCheck
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "TinyHealthCheck had an exception!");
+                _logger.LogError(e, "TinyHealthCheck<{TypeName}> encountered an exception!", _typeName);
             }
         }
 
@@ -62,8 +66,8 @@ namespace TinyHealthCheck
         private async Task ProcessHealthCheck(HttpListenerContext client, CancellationToken cancellationToken)
         {
             var request = client.Request;
-
-            _logger.LogInformation($"TinyHealthCheck received a request from {request.RemoteEndPoint}");
+            
+            _logger.Log(_config.LogLevel, "TinyHealthCheck<{TypeName}> received a request from {RequestEndpoint}", _typeName, request.RemoteEndPoint);
 
             using (var response = client.Response)
             {
