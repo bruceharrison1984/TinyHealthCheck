@@ -51,11 +51,6 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
-      - name: Download TinyHealthCheck artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: nuget-package
-
       ## Checkout so we can apply the new tag
       - uses: actions/checkout@v3
         with:
@@ -68,8 +63,13 @@ jobs:
       - name: Echo version
         run: echo ${{ steps.getReleaseVersion.outputs.tag }}
 
+      - name: Download TinyHealthCheck artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-package
+
       - name: dir
-        run: ls -lha
+        run: ls -lhaR
       # - name: Push Nuget Package
       #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
 
