@@ -16,9 +16,6 @@ jobs:
         id: getReleaseVersion
         run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
 
-      - name: Echo version
-        run: echo ${{ steps.getReleaseVersion.outputs.tag }}
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
