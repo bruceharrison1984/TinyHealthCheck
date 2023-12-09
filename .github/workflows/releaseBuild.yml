@@ -36,16 +36,43 @@ jobs:
       - name: Package Nuget
         run: dotnet pack -p:PackageVersion=${{ steps.getReleaseVersion.outputs.tag }} -o ./output
 
-      - name: Push Nuget Package
-        run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+      - name: Upload TinyHealthCheck package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget-package
+          path: ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg
+
+  publish-package:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Download TinyHealthCheck artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-package
 
       ## Checkout so we can apply the new tag
       - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
 
+      - name: Get Release Version
+        id: getReleaseVersion
+        run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
+
+      - name: Echo version
+        run: echo ${{ steps.getReleaseVersion.outputs.tag }}
+
+      # - name: Push Nuget Package
+      #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+
       ## Documentation: https://github.com/marvinpinto/action-automatic-releases
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
+      # - uses: "marvinpinto/action-automatic-releases@latest"
+      #   with:
+      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
+      #     prerelease: false
