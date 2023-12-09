@@ -1,4 +1,4 @@
-name: Release Build
+name: Development Build, Integration Test, & Publish
 
 on:
   push:
@@ -6,47 +6,73 @@ on:
       - "v*.*.*"
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Get Release Version
-      id: getReleaseVersion
-      run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
+      - name: Get Release Version
+        id: getReleaseVersion
+        run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
 
-    - name: Echo version
-      run: echo ${{ steps.getReleaseVersion.outputs.tag }}
+      - name: Echo version
+        run: echo ${{ steps.getReleaseVersion.outputs.tag }}
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build
+        run: dotnet build --no-restore
 
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
 
-    - name: Package Nuget
-      run: dotnet pack -p:PackageVersion=${{ steps.getReleaseVersion.outputs.tag }} -o ./output
+      - name: Package Nuget
+        run: dotnet pack -p:PackageVersion=${{ steps.getReleaseVersion.outputs.tag }} -o ./output
 
-    - name: Push Nuget Package
-      run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+      - name: Upload TinyHealthCheck package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget-package
+          path: ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg
 
-    ## Checkout so we can apply the new tag
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: "0"
+  publish-package:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
 
-    ## Documentation: https://github.com/marvinpinto/action-automatic-releases
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
+      - name: Download TinyHealthCheck artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-package
+
+      ## Checkout so we can apply the new tag
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+
+      - name: Get Release Version
+        id: getReleaseVersion
+        run: echo tag=${GITHUB_REF#refs/*/v} >> $GITHUB_OUTPUT
+
+      - name: Echo version
+        run: echo ${{ steps.getReleaseVersion.outputs.tag }}
+
+      # - name: Push Nuget Package
+      #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+
+      ## Documentation: https://github.com/marvinpinto/action-automatic-releases
+      # - uses: "marvinpinto/action-automatic-releases@latest"
+      #   with:
+      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
+      #     prerelease: false
