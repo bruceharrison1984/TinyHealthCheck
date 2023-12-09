@@ -66,10 +66,11 @@ jobs:
       - name: Download TinyHealthCheck artifact
         uses: actions/download-artifact@v3
         with:
+          path: ./package
           name: nuget-package
 
       - name: dir
-        run: ls -lhaR
+        run: ls -lha
       # - name: Push Nuget Package
       #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
 
