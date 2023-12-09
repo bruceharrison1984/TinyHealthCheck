@@ -68,11 +68,11 @@ jobs:
       - name: Echo version
         run: echo ${{ steps.getReleaseVersion.outputs.tag }}
 
-      # - name: Push Nuget Package
-      #   run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
+      - name: Push Nuget Package
+        run: dotnet nuget push ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg --api-key ${{secrets.NUGET_TOKEN}} --source https://api.nuget.org/v3/index.json
 
       ## Documentation: https://github.com/marvinpinto/action-automatic-releases
-      # - uses: "marvinpinto/action-automatic-releases@latest"
-      #   with:
-      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
-      #     prerelease: false
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
