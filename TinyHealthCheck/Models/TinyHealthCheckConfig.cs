@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace TinyHealthCheck.Models
+﻿namespace TinyHealthCheck.Models
 {
     public class TinyHealthCheckConfig
     {
@@ -19,10 +17,5 @@ namespace TinyHealthCheck.Models
         /// The url path that the health check will be accessible on.
         /// </summary>
         public string UrlPath { get; set; } = "/healthz";
-
-        /// <summary>
-        /// The logging level of the health check.
-        /// </summary>
-        public LogLevel LogLevel = LogLevel.Information;
     }
 }

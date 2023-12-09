@@ -16,7 +16,7 @@ namespace TinyHealthCheck
         private readonly TinyHealthCheckConfig _config;
         private readonly T _healthCheck;
         private readonly HttpListener _listener = new HttpListener();
-        
+
         private readonly string _typeName;
 
         public HealthCheckService(ILogger<HealthCheckService<T>> logger, T healthCheck, TinyHealthCheckConfig config)
@@ -24,7 +24,7 @@ namespace TinyHealthCheck
             _logger = logger;
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _healthCheck = healthCheck;
-            
+
             _typeName = typeof(T).Name;
         }
 
@@ -40,14 +40,14 @@ namespace TinyHealthCheck
                 _listener.Prefixes.Add($"http://{_config.Hostname}:{_config.Port}/");
                 _listener.Start();
 
-                _logger.Log(_config.LogLevel, "TinyHealthCheck<{TypeName}> started on port {Port}", _typeName, _config.Port);
+                _logger.LogDebug("TinyHealthCheck<{TypeName}> started on port {Port}", _typeName, _config.Port);
 
                 var cancelTask = Task.Delay(Timeout.Infinite, cancellationToken);
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var httpContextTask = _listener.GetContextAsync();
                     var completedTask = await Task.WhenAny(httpContextTask, cancelTask).ConfigureAwait(false);
-                    if(completedTask == cancelTask) break;
+                    if (completedTask == cancelTask) break;
                     ThreadPool.QueueUserWorkItem(async x => await ProcessHealthCheck((HttpListenerContext)x, cancellationToken).ConfigureAwait(false), httpContextTask.Result);
                 }
             }
@@ -66,8 +66,8 @@ namespace TinyHealthCheck
         private async Task ProcessHealthCheck(HttpListenerContext client, CancellationToken cancellationToken)
         {
             var request = client.Request;
-            
-            _logger.Log(_config.LogLevel, "TinyHealthCheck<{TypeName}> received a request from {RequestEndpoint}", _typeName, request.RemoteEndPoint);
+
+            _logger.LogDebug("TinyHealthCheck<{TypeName}> received a request from {RequestEndpoint}", _typeName, request.RemoteEndPoint);
 
             using (var response = client.Response)
             {
