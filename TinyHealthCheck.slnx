@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DummyServiceWorker/DummyServiceWorker.csproj" />
+  <Project Path="Tests/UnitTests.csproj" />
+  <Project Path="TinyHealthCheck/TinyHealthCheck.csproj" />
+</Solution>
