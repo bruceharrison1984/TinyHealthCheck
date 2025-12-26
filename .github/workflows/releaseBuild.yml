@@ -34,7 +34,7 @@ jobs:
         run: dotnet pack -p:PackageVersion=${{ steps.getReleaseVersion.outputs.tag }} -o ./output
 
       - name: Upload TinyHealthCheck package artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: nuget-package
           path: ./output/TinyHealthCheck.${{ steps.getReleaseVersion.outputs.tag }}.nupkg
@@ -61,7 +61,7 @@ jobs:
         run: echo ${{ steps.getReleaseVersion.outputs.tag }}
 
       - name: Download TinyHealthCheck artifact
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v7
         with:
           path: ./package
           name: nuget-package
